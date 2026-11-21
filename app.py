@@ -33,9 +33,10 @@ def load_data():
         df["Quantity"] = pd.to_numeric(df["Quantity"], errors="coerce")
         df["UnitPrice"] = pd.to_numeric(df["UnitPrice"], errors="coerce")
         df["RevenueGBP"] = df["Quantity"] * df["UnitPrice"]
-        df["Cancel"] = df["InvoiceNo"].str.upper().str.startswith("C") | (df["Quantity"] &lt;= 0)
+        df["Cancel"] = df["InvoiceNo"].str.upper().str.startswith("C") | (df["Quantity"] <= 0)
         df = df.dropna(subset=["InvoiceDate", "Quantity", "UnitPrice"])
-        df = df[(df["Quantity"] &gt; 0) & (df["UnitPrice"] &gt; 0) & (~df["Cancel"])].copy()
+        df = df[(df["Quantity"] > 0) & (df["UnitPrice"] > 0) & (~df["Cancel"])].copy()
+        
         df["Date"] = df["InvoiceDate"].dt.date
         return df
     except Exception as e:
@@ -80,8 +81,8 @@ else:
 
 mask = (
     (df["Country"] == selected_country)
-    & (df["InvoiceDate"].dt.date &gt;= start_date)
-    & (df["InvoiceDate"].dt.date &lt;= end_date)
+    & (df["InvoiceDate"].dt.date >= start_date)    
+        & (df["InvoiceDate"].dt.date <= end_date)    
 )
 filtered = df[mask].copy()
 
@@ -200,7 +201,7 @@ with tab_inventory:
 
     st.metric("Reorder Point", f"{reorder_point:.1f} units")
     st.metric("Suggested Order Qty", f"{suggested_qty:,} units")
-
+if current_stock <= reorder_point:
     if current_stock &lt;= reorder_point:
         st.warning("Stock is at or below the reorder point. Consider ordering soon.")
     else:

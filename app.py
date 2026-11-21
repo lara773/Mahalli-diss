@@ -57,7 +57,6 @@ st.info(
     "must precede any operational decision."
 )
 
-# ---------- SIDEBAR FILTERS ----------
 st.sidebar.header("Filters")
 countries = sorted(df["Country"].unique().tolist())
 country_list = ["All countries"] + countries
@@ -79,7 +78,6 @@ if len(date_range) == 2:
 else:
     start_date = end_date = date_range[0]
 
-# ---------- FILTER DATA ----------
 mask = (
     (df["Country"] == selected_country)
     & (df["InvoiceDate"].dt.date &gt;= start_date)
@@ -91,7 +89,6 @@ if filtered.empty:
     st.warning("No data matches the selected filters.")
     st.stop()
 
-# ---------- INFO BAR ----------
 st.markdown("---")
 st.markdown(
     f"**Source:** {UCI_PAGE} | "
@@ -101,12 +98,10 @@ st.markdown(
 )
 st.markdown("---")
 
-# ---------- TABS ----------
 tab_overview, tab_product, tab_pricing, tab_inventory, tab_agency = st.tabs(
     ["Overview", "Product Analysis", "Pricing", "Inventory", "Agency Trust"]
 )
 
-# ===== OVERVIEW =====
 with tab_overview:
     total_rev = filtered["RevenueGBP"].sum()
     total_units = int(filtered["Quantity"].sum())
@@ -125,7 +120,6 @@ with tab_overview:
     top10 = filtered.groupby("Country")["RevenueGBP"].sum().nlargest(10).reset_index()
     st.bar_chart(top10.set_index("Country"), y="RevenueGBP")
 
-# ===== PRODUCT ANALYSIS =====
 with tab_product:
     st.subheader("Top 30 Products by Revenue")
     prod = filtered.groupby(["StockCode", "Description"]).agg(
@@ -140,7 +134,6 @@ with tab_product:
         "Download CSV", data=csv, file_name="top_products.csv", mime="text/csv"
     )
 
-# ===== PRICING =====
 with tab_pricing:
     st.subheader("Product Pricing Analysis")
     pric = filtered.groupby("Description").agg(
@@ -174,7 +167,6 @@ with tab_pricing:
         "can be derived from these figures alone.**"
     )
 
-# ===== INVENTORY =====
 with tab_inventory:
     st.subheader("Product Inventory Estimates")
     inv = filtered.groupby(["StockCode", "Description"]).agg(
@@ -191,40 +183,39 @@ with tab_inventory:
         use_container_width=True,
     )
 
- prod_sel = st.selectbox("Select Product", inv["Description"].tolist())
- sel_inv = inv[inv["Description"] == prod_sel].iloc[0]
+    prod_sel = st.selectbox("Select Product", inv["Description"].tolist())
+    sel_inv = inv[inv["Description"] == prod_sel].iloc[0]
 
- st.write(f"**StockCode:** {sel_inv['StockCode']}")
- st.write(f"**Total Quantity:** {int(sel_inv['total_quantity']):,}")
- st.write(f"**Estimated Daily Demand:** {sel_inv['avg_daily_demand']:.2f} units/day")
- st.write(f"**Active Days:** {int(sel_inv['active_days'])}")
+    st.write(f"**StockCode:** {sel_inv['StockCode']}")
+    st.write(f"**Total Quantity:** {int(sel_inv['total_quantity']):,}")
+    st.write(f"**Estimated Daily Demand:** {sel_inv['avg_daily_demand']:.2f} units/day")
+    st.write(f"**Active Days:** {int(sel_inv['active_days'])}")
 
- current_stock = st.number_input("Current Stock (units)", min_value=0, value=0, key="current_stock")
- lead_time = st.number_input("Supplier Lead Time (days)", min_value=1, value=7, key="lead_time")
- safety_stock = st.number_input("Safety Stock (units)", min_value=0, value=5, key="safety_stock")
+    current_stock = st.number_input("Current Stock (units)", min_value=0, value=0, key="current_stock")
+    lead_time = st.number_input("Supplier Lead Time (days)", min_value=1, value=7, key="lead_time")
+    safety_stock = st.number_input("Safety Stock (units)", min_value=0, value=5, key="safety_stock")
 
- reorder_point = sel_inv["avg_daily_demand"] * lead_time + safety_stock
- suggested_qty = max(0, math.ceil(reorder_point - current_stock))
+    reorder_point = sel_inv["avg_daily_demand"] * lead_time + safety_stock
+    suggested_qty = max(0, math.ceil(reorder_point - current_stock))
 
- st.metric("Reorder Point", f"{reorder_point:.1f} units")
- st.metric("Suggested Order Qty", f"{suggested_qty:,} units")
+    st.metric("Reorder Point", f"{reorder_point:.1f} units")
+    st.metric("Suggested Order Qty", f"{suggested_qty:,} units")
 
     if current_stock &lt;= reorder_point:
- st.warning("Stock is at or below the reorder point. Consider ordering soon.")
+        st.warning("Stock is at or below the reorder point. Consider ordering soon.")
     else:
- st.success("Stock is above the reorder point. No immediate action needed.")
+        st.success("Stock is above the reorder point. No immediate action needed.")
 
- st.info(
+    st.info(
         "This is a **baseline estimate** based on historical average demand. "
         "It does not account for seasonality, promotions, supply-chain variability, "
         "or minimum order quantities (MOQ). Always validate with demand forecasting, "
         "stock-level review, lead-time reliability, and supplier MOQ constraints."
     )
 
-# ===== AGENCY TRUST =====
 with tab_agency:
- st.subheader("Marketing-Agency Screening Checklist")
- checks = [
+    st.subheader("Marketing-Agency Screening Checklist")
+    checks = [
         "1. Clear KPI / target defined with the agency",
         "2. Documented baseline sales and reporting dates",
         "3. Target period and reporting cadence established",
@@ -235,20 +226,19 @@ with tab_agency:
         "8. Agency portfolio and client references verifiable",
         "9. Written scope, deliverables, payment terms, and cancellation policy",
     ]
- done = []
+    done = []
     for i, c in enumerate(checks, 1):
- done.append(st.checkbox(c, value=False, key=f"check_{i}"))
+        done.append(st.checkbox(c, value=False, key=f"check_{i}"))
 
- unchecked = sum(1 for d in done if not d)
- st.write(f"**Checks completed:** {sum(done)} / {len(checks)}")
+    unchecked = sum(1 for d in done if not d)
+    st.write(f"**Checks completed:** {sum(done)} / {len(checks)}")
     if unchecked:
- st.warning(f"{unchecked} unchecked item(s) means **unconfirmed**, not proof of fraud.")
- st.info(
+        st.warning(f"{unchecked} unchecked item(s) means **unconfirmed**, not proof of fraud.")
+    st.info(
         "This checklist is a **screening aid**, not a fraud detector. "
         "Always conduct independent verification and legal review before engagement."
     )
 
-# ---------- FOOTER ----------
 st.markdown("---")
 st.caption(
     "Chen, M. (2015). UCI Online Retail Dataset. "
@@ -256,4 +246,4 @@ st.caption(
     "Prices are in GBP. This dataset reflects historical UK transactions "
     "(Dec 2010 - Dec 2011) and is not current Saudi market data. "
     f"[Dataset Link]({UCI_PAGE})"
-)
+    )

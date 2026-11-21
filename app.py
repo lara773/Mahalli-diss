@@ -201,11 +201,10 @@ with tab_inventory:
 
     st.metric("Reorder Point", f"{reorder_point:.1f} units")
     st.metric("Suggested Order Qty", f"{suggested_qty:,} units")
-if current_stock <= reorder_point:
-    if current_stock &lt;= reorder_point:
-        st.warning("Stock is at or below the reorder point. Consider ordering soon.")
-    else:
-        st.success("Stock is above the reorder point. No immediate action needed.")
+    if current_stock <= reorder_point:
+            st.warning("Stock is at or below the reorder point. Consider ordering soon.")
+     else:
+            st.success("Stock is above the reorder point. No immediate action needed.")
 
     st.info(
         "This is a **baseline estimate** based on historical average demand. "

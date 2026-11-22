@@ -166,9 +166,9 @@ with tab_pricing:
         "It does **not** include acquisition costs, platform fees, shipping charges, or "
         "current Saudi retail prices. **No profit margin or Saudi-price recommendation "
         "can be derived from these figures alone.**"
-    )
 
- with tab_inventory:
+                        
+with tab_inventory:
     st.subheader("Product Inventory Estimates")
     inv = filtered.groupby(["StockCode", "Description"]).agg(
         total_quantity=("Quantity", "sum"),
@@ -202,9 +202,9 @@ with tab_pricing:
     st.metric("Reorder Point", f"{reorder_point:.1f} units")
     st.metric("Suggested Order Qty", f"{suggested_qty:,} units")
     if current_stock <= reorder_point:
-             st.warning("Stock is at or below the reorder point. Consider ordering soon.")   
+        st.warning("Stock is at or below the reorder point. Consider ordering soon.")   
     else:
-             st.success("Stock is above the reorder point. No immediate action needed.")
+        st.success("Stock is above the reorder point. No immediate action needed.")
 
     st.info(
         "This is a **baseline estimate** based on historical average demand. "

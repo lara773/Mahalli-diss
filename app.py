@@ -166,7 +166,7 @@ with tab_pricing:
         "It does **not** include acquisition costs, platform fees, shipping charges, or "
         "current Saudi retail prices. **No profit margin or Saudi-price recommendation "
         "can be derived from these figures alone.**"
-
+    )
                         
 with tab_inventory:
     st.subheader("Product Inventory Estimates")

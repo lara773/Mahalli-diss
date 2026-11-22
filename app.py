@@ -168,14 +168,14 @@ with tab_pricing:
         "can be derived from these figures alone.**"
     )
 
-with tab_inventory:
+    with tab_inventory:
     st.subheader("Product Inventory Estimates")
     inv = filtered.groupby(["StockCode", "Description"]).agg(
         total_quantity=("Quantity", "sum"),
         first_date=("InvoiceDate", "min"),
         last_date=("InvoiceDate", "max"),
     ).reset_index()
-    inv["active_days"] = (inv["last_date"] - inv["first_date"]).dt.days.clip(lower=1) + 1
+    inv["active_days"] = max((filtered["InvoiceDate"].max() - filtered["InvoiceDate"].min()).days + 1, 1)
     inv["avg_daily_demand"] = inv["total_quantity"] / inv["active_days"]
     inv = inv.sort_values("total_quantity", ascending=False).head(200)
 

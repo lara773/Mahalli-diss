@@ -168,7 +168,7 @@ with tab_pricing:
         "can be derived from these figures alone.**"
     )
 
-    with tab_inventory:
+ with tab_inventory:
     st.subheader("Product Inventory Estimates")
     inv = filtered.groupby(["StockCode", "Description"]).agg(
         total_quantity=("Quantity", "sum"),
